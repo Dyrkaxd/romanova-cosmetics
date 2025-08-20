@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Product, PaginatedResponse } from '../types';
-import { PlusIcon, XMarkIcon, EyeIcon, PencilIcon, TrashIcon, UploadIcon, DocumentTextIcon } from '../components/Icons';
+import { PlusIcon, XMarkIcon, EyeIcon, PencilIcon, TrashIcon, UploadIcon, DocumentTextIcon, ProductsIcon } from '../components/Icons';
 import { authenticatedFetch } from '../utils/api';
 import Pagination from '../components/Pagination';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -290,6 +290,18 @@ const ProductsPage: React.FC = () => {
     }
   };
   
+  const EmptyState = () => (
+    <div className="flex flex-col items-center">
+        <ProductsIcon className="w-12 h-12 text-slate-300 dark:text-slate-600" />
+        <h3 className="mt-4 text-lg font-semibold text-slate-800 dark:text-slate-100">
+            {searchTerm ? 'Товари не знайдено' : 'Товарів ще немає'}
+        </h3>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {searchTerm ? 'Спробуйте змінити пошуковий запит.' : "Натисніть 'Додати товар', щоб розпочати."}
+        </p>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
@@ -359,8 +371,8 @@ const ProductsPage: React.FC = () => {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-                    { !pageError && (totalCount === 0 && searchTerm === '' ? "Товарів ще немає. Натисніть 'Додати новий товар', щоб створити." : "Товарів, що відповідають вашему пошуку, не знайдено.")}
+                  <td colSpan={5} className="px-6 py-20 text-center">
+                    <EmptyState />
                   </td>
                 </tr>
               )}
@@ -407,8 +419,8 @@ const ProductsPage: React.FC = () => {
               ))}
             </ul>
           ) : (
-            <div className="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-              {!pageError && (totalCount === 0 && searchTerm === '' ? "Товарів ще немає. Натисніть 'Додати новий товар', щоб створити." : "Товарів, що відповідають вашему пошуку, не знайдено.")}
+            <div className="px-6 py-20 text-center">
+              <EmptyState />
             </div>
           )}
         </div>

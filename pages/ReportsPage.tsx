@@ -2,28 +2,11 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { authenticatedFetch } from '../utils/api';
 import { ReportData, SalesDataPoint, TopProduct, TopCustomer, RevenueByGroup, Expense } from '../types';
 import { ChartBarIcon, CurrencyDollarIcon, UsersIcon, DownloadIcon, LightBulbIcon } from '../components/Icons';
+import StatCard from '../components/StatCard';
 
 
 // Helper to format date as YYYY-MM-DD
 const toYYYYMMDD = (date: Date) => date.toISOString().split('T')[0];
-
-const StatCard: React.FC<{ title: string; value: string; subValue?: string, isLoading: boolean; colorClass?: string, tooltipText?: string }> = ({ title, value, subValue, isLoading, colorClass = 'text-slate-800 dark:text-slate-100', tooltipText }) => (
-    <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 relative group">
-        {tooltipText && (
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
-                {tooltipText}
-                <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-slate-800"></div>
-            </div>
-        )}
-        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</p>
-        {isLoading ? (
-            <div className="h-9 w-3/4 bg-slate-200 dark:bg-slate-700 rounded-md mt-1 animate-pulse"></div>
-        ) : (
-            <p className={`text-3xl font-bold mt-1 ${colorClass}`}>{value}</p>
-        )}
-        {subValue && !isLoading && <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">{subValue}</p>}
-    </div>
-);
 
 const ReportSalesProfitChart: React.FC<{ data: SalesDataPoint[], isLoading: boolean }> = ({ data, isLoading }) => {
     const chartRef = useRef<SVGSVGElement>(null);
@@ -472,12 +455,14 @@ const ReportsPage: React.FC = () => {
                             value={`₴${(reportData?.totalRevenue ?? 0).toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
                             isLoading={isLoading} 
                             subValue={`${(reportData?.totalOrders ?? 0)} замовлень`}
+                            icon={CurrencyDollarIcon}
                             tooltipText="Загальна сума грошей, отримана від клієнтів за замовленнями зі статусом 'Отримано' протягом вибраного періоду. Це дохід до вирахування будь-яких витрат."
                         />
                         <StatCard 
                             title="Валовий прибуток" 
                             value={`₴${(reportData?.grossProfit ?? 0).toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
                             isLoading={isLoading} 
+                            icon={CurrencyDollarIcon}
                             colorClass="text-blue-600 dark:text-blue-400"
                             tooltipText="Дохід мінус собівартість проданих товарів (ціна салону). Цей показник демонструє прибутковість основної діяльності до врахування операційних витрат."
                         />
@@ -485,6 +470,7 @@ const ReportsPage: React.FC = () => {
                             title="Витрати" 
                             value={`₴${(reportData?.totalExpenses ?? 0).toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
                             isLoading={isLoading} 
+                            icon={CurrencyDollarIcon}
                             colorClass="text-red-600 dark:text-red-500"
                             tooltipText="Сума всіх операційних витрат, зафіксованих у системі за вибраний період. Включає оренду, маркетинг, зарплати тощо."
                         />
@@ -492,6 +478,7 @@ const ReportsPage: React.FC = () => {
                             title="Чистий прибуток" 
                             value={`₴${(reportData?.totalProfit ?? 0).toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
                             isLoading={isLoading} 
+                            icon={CurrencyDollarIcon}
                             colorClass="text-green-600 dark:text-green-500"
                             tooltipText="Фінальний фінансовий результат. Розраховується як Дохід мінус Витрати. Це гроші, які ви заробили."
                         />
