@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef, FC, SVGProps } from 'react';
 import { Order, OrderItem, Customer, Product, ManagedUser, PaginatedResponse } from '../types';
-import { EyeIcon, XMarkIcon, PlusIcon, TrashIcon, PencilIcon, DocumentTextIcon, FilterIcon, DownloadIcon, ChevronDownIcon, ShareIcon, TruckIcon } from '../components/Icons';
+import { EyeIcon, XMarkIcon, PlusIcon, TrashIcon, PencilIcon, DocumentTextIcon, FilterIcon, DownloadIcon, ChevronDownIcon, ShareIcon } from '../components/Icons';
 import { authenticatedFetch } from '../utils/api';
 import Pagination from '../components/Pagination';
 import { useAuth } from '../AuthContext';
@@ -490,7 +490,6 @@ const OrdersPage: React.FC = () => {
                                         <button onClick={() => openViewModal(order)} className="p-2 text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 rounded-md hover:bg-sky-50 dark:hover:bg-sky-500/10" title="Переглянути"><EyeIcon className="w-5 h-5"/></button>
                                         <button onClick={() => navigate(`/invoice/${order.id}`)} className="p-2 text-slate-500 dark:text-slate-400 hover:text-gray-600 dark:hover:text-gray-400 rounded-md hover:bg-gray-50 dark:hover:bg-gray-500/10" title="Рахунок-фактура"><DocumentTextIcon className="w-5 h-5"/></button>
                                         <button onClick={() => handleCopyInvoiceLink(order.id)} className="p-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-md hover:bg-blue-50 dark:hover:bg-blue-500/10" title="Копіювати посилання на рахунок"><ShareIcon className="w-5 h-5"/></button>
-                                        <button onClick={() => navigate(`/bill-of-lading/${order.id}`)} className="p-2 text-slate-500 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 rounded-md hover:bg-green-50 dark:hover:bg-green-500/10" title="Товарно-транспортна накладна (ТТН)"><TruckIcon className="w-5 h-5"/></button>
                                         <button onClick={() => openEditModal(order)} className="p-2 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10" title="Редагувати"><PencilIcon className="w-5 h-5"/></button>
                                         <button onClick={() => handleDeleteOrder(order.id)} className="p-2 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-500/10" title="Видалити"><TrashIcon className="w-5 h-5"/></button>
                                     </td>
@@ -522,7 +521,6 @@ const OrdersPage: React.FC = () => {
                                       <button onClick={() => openViewModal(order)} className="p-2 text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-sky-500/10 rounded-md"><EyeIcon className="w-5 h-5"/></button>
                                       <button onClick={() => navigate(`/invoice/${order.id}`)} className="p-2 text-slate-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-gray-500/10 rounded-md"><DocumentTextIcon className="w-5 h-5"/></button>
                                       <button onClick={() => handleCopyInvoiceLink(order.id)} className="p-2 text-slate-500 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-md"><ShareIcon className="w-5 h-5"/></button>
-                                      <button onClick={() => navigate(`/bill-of-lading/${order.id}`)} className="p-2 text-slate-500 dark:text-slate-400 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-md"><TruckIcon className="w-5 h-5"/></button>
                                       <button onClick={() => openEditModal(order)} className="p-2 text-slate-500 dark:text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-md"><PencilIcon className="w-5 h-5"/></button>
                                       <button onClick={() => handleDeleteOrder(order.id)} className="p-2 text-slate-500 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md"><TrashIcon className="w-5 h-5"/></button>
                                     </div>
