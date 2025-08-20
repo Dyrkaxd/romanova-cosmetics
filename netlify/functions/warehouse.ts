@@ -1,7 +1,7 @@
 
 import { Handler, HandlerEvent } from '@netlify/functions';
 import { supabase } from '../../services/supabaseClient';
-import type { Product } from '../../types';
+import type { Product, PaginatedResponse } from '../../types';
 import type { Database } from '../../types/supabase';
 import { requireAuth } from '../utils/auth';
 
@@ -66,26 +66,52 @@ const handler: Handler = async (event: HandlerEvent) => {
     const resourceId = pathParts.length > 2 ? pathParts[2] : null;
 
     switch (event.httpMethod) {
-      case 'GET':
+      case 'GET': {
+        const { page = '1', pageSize = '20', search = '', group: groupFilter = 'All' } = event.queryStringParameters || {};
+        const currentPage = parseInt(page, 10);
+        const size = parseInt(pageSize, 10);
+        const from = (currentPage - 1) * size;
+        const to = from + size - 1;
+
         const allProductsPromises = Object.entries(productGroups).map(async ([group, tableName]) => {
-          const { data, error } = await supabase.from(tableName).select('id, name, quanity, created_at');
+          const { data, error } = await supabase.from(tableName).select('id, name, quanity');
           if (error) {
             console.error(`Error fetching from table ${tableName}:`, error);
             return [];
           }
           return (data || []).map(p => ({
-            id: p.id,
-            name: p.name,
+            id: p.id as string,
+            name: p.name as string,
             group: group,
             quantity: p.quanity ?? 0,
-            created_at: p.created_at,
           }));
         });
         
         const productsByGroup = await Promise.all(allProductsPromises);
-        const allProducts = productsByGroup.flat().sort((a,b) => (a.name || '').localeCompare(b.name || ''));
+        let allProducts = productsByGroup.flat();
+
+        if (search) {
+          allProducts = allProducts.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+        }
+
+        if (groupFilter !== 'All') {
+          allProducts = allProducts.filter(p => p.group === groupFilter);
+        }
+
+        allProducts.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
         
-        return { statusCode: 200, headers: commonHeaders, body: JSON.stringify({ data: allProducts }) };
+        const totalCount = allProducts.length;
+        const paginatedData = allProducts.slice(from, to + 1);
+        
+        const response: PaginatedResponse<any> = {
+          data: paginatedData,
+          totalCount,
+          currentPage,
+          pageSize: size,
+        };
+
+        return { statusCode: 200, headers: commonHeaders, body: JSON.stringify(response) };
+      }
 
       case 'PUT':
         if (!resourceId) {

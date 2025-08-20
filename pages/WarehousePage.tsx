@@ -1,11 +1,24 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Product } from '../types';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Product, PaginatedResponse } from '../types';
 import { authenticatedFetch } from '../utils/api';
 import { FilterIcon } from '../components/Icons';
+import Pagination from '../components/Pagination';
 
 type WarehouseProduct = Pick<Product, 'id' | 'name' | 'group' | 'quantity'>;
 
-const productGroups = ['All', 'BDR', 'LA', 'АГ', 'АБ', 'АР', 'без сокращений', 'АФ', 'ДС', 'м8', 'JDA', 'Faith', 'AB', 'ГФ', 'ЕС', 'ГП', 'СД', 'ATA', 'W'];
+const productGroups = ['All', 'BDR', 'LA', 'АГ', 'АБ', 'АР', 'без сокращений', 'АФ', 'ДС', 'м8', 'JDA', 'Faith', 'AB', 'ГФ', 'ЕС', 'ГП', 'СД', 'ATA', 'W', 'Гуаша'];
+
+const useDebounce = (value: string, delay: number) => {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => clearTimeout(handler);
+    }, [value, delay]);
+    return debouncedValue;
+};
+
 
 const WarehousePage: React.FC = () => {
     const [products, setProducts] = useState<WarehouseProduct[]>([]);
@@ -19,17 +32,30 @@ const WarehousePage: React.FC = () => {
     const [editingQuantities, setEditingQuantities] = useState<Record<string, string>>({});
     const [savingStates, setSavingStates] = useState<Record<string, boolean>>({});
 
-    const fetchProducts = useCallback(async () => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
+    const [totalCount, setTotalCount] = useState(0);
+    const debouncedSearchTerm = useDebounce(searchTerm, 400);
+
+    const fetchProducts = useCallback(async (page: number, size: number, search: string, group: string) => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await authenticatedFetch('/api/warehouse');
+            const query = new URLSearchParams({ 
+                page: String(page), 
+                pageSize: String(size),
+                search: search,
+                group: group,
+            });
+            const response = await authenticatedFetch(`/api/warehouse?${query.toString()}`);
             if (!response.ok) {
                 const errData = await response.json();
                 throw new Error(errData.message || 'Failed to fetch warehouse data.');
             }
-            const { data } = await response.json();
-            setProducts(data);
+            const data: PaginatedResponse<WarehouseProduct> = await response.json();
+            setProducts(data.data);
+            setTotalCount(data.totalCount);
+            setCurrentPage(data.currentPage);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -38,8 +64,8 @@ const WarehousePage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
+        fetchProducts(currentPage, pageSize, debouncedSearchTerm, selectedGroup);
+    }, [fetchProducts, currentPage, pageSize, debouncedSearchTerm, selectedGroup]);
 
     useEffect(() => {
         if (successMessage) {
@@ -48,13 +74,24 @@ const WarehousePage: React.FC = () => {
         }
     }, [successMessage]);
 
-    const filteredProducts = useMemo(() => {
-        return products.filter(product => {
-            const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesGroup = selectedGroup === 'All' || product.group === selectedGroup;
-            return matchesSearch && matchesGroup;
-        });
-    }, [products, searchTerm, selectedGroup]);
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handleGroupChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedGroup(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+    
+    const handlePageSizeChange = (size: number) => {
+        setPageSize(size);
+        setCurrentPage(1);
+    };
 
     const handleQuantityChange = (productId: string, value: string) => {
         setEditingQuantities(prev => ({ ...prev, [productId]: value }));
@@ -108,6 +145,8 @@ const WarehousePage: React.FC = () => {
         }
     };
 
+    const filtersActive = searchTerm !== '' || selectedGroup !== 'All';
+
     return (
         <div className="space-y-6">
             <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Керування складом</h2>
@@ -120,14 +159,14 @@ const WarehousePage: React.FC = () => {
                     type="search"
                     placeholder="Пошук за назвою..."
                     value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
+                    onChange={handleSearchChange}
                     className="w-full md:w-1/2 lg:w-2/3 p-2.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                 />
                 <div className="relative w-full md:w-1/2 lg:w-1/3">
                     <FilterIcon className="w-5 h-5 text-slate-400 absolute top-1/2 left-3 transform -translate-y-1/2 pointer-events-none"/>
                     <select
                         value={selectedGroup}
-                        onChange={e => setSelectedGroup(e.target.value)}
+                        onChange={handleGroupChange}
                         className="w-full appearance-none p-2.5 pl-10 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
                     >
                         {productGroups.map(group => (
@@ -151,8 +190,8 @@ const WarehousePage: React.FC = () => {
                         <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
                             {isLoading ? (
                                 <tr><td colSpan={3} className="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">Завантаження даних складу...</td></tr>
-                            ) : filteredProducts.length > 0 ? (
-                                filteredProducts.map((product) => {
+                            ) : products.length > 0 ? (
+                                products.map((product) => {
                                     const isEditing = editingQuantities[product.id] !== undefined;
                                     const currentValue = isEditing ? editingQuantities[product.id] : product.quantity;
                                     const isSaving = savingStates[product.id];
@@ -190,7 +229,7 @@ const WarehousePage: React.FC = () => {
                                 })
                             ) : (
                                 <tr><td colSpan={3} className="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-                                    {products.length === 0 ? "На складі немає товарів." : "Товарів, що відповідають фільтрам, не знайдено."}
+                                    {filtersActive ? "Товарів, що відповідають фільтрам, не знайдено." : "На складі немає товарів."}
                                 </td></tr>
                             )}
                         </tbody>
@@ -201,9 +240,9 @@ const WarehousePage: React.FC = () => {
                 <div className="md:hidden">
                     {isLoading ? (
                         <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">Завантаження даних складу...</div>
-                    ) : filteredProducts.length > 0 ? (
+                    ) : products.length > 0 ? (
                          <ul className="divide-y divide-slate-200 dark:divide-slate-700">
-                            {filteredProducts.map(product => {
+                            {products.map(product => {
                                 const isEditing = editingQuantities[product.id] !== undefined;
                                 const currentValue = isEditing ? editingQuantities[product.id] : product.quantity;
                                 const isSaving = savingStates[product.id];
@@ -241,10 +280,20 @@ const WarehousePage: React.FC = () => {
                         </ul>
                     ) : (
                         <div className="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-                            {products.length === 0 ? "На складі немає товарів." : "Товарів, що відповідають фільтрам, не знайдено."}
+                            {filtersActive ? "Товарів, що відповідають фільтрам, не знайдено." : "На складі немає товарів."}
                         </div>
                     )}
                 </div>
+                {totalCount > 0 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalCount={totalCount}
+                        pageSize={pageSize}
+                        onPageChange={handlePageChange}
+                        onPageSizeChange={handlePageSizeChange}
+                        isLoading={isLoading}
+                    />
+                )}
             </div>
         </div>
     );
