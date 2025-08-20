@@ -1,11 +1,27 @@
-<div align="center">
+# Панель керування "Romanova Cosmetics"
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Цей репозиторій містить все необхідне для запуску та розгортання панелі керування вашим інтернет-магазином.
 
-  <h1>Built with AI Studio</h2>
+## Змінні середовища
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+Для повноцінної роботи додатку необхідно налаштувати наступні змінні середовища у вашому проекті Netlify (або у файлі `.env` для локальної розробки):
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+-   `SUPABASE_URL`: URL вашого проекту Supabase.
+-   `SUPABASE_SERVICE_ROLE_KEY`: Ключ `service_role` вашого проекту Supabase. Використовується для всіх серверних операцій.
+-   `API_KEY`: Ваш ключ API для Google Gemini (використовується для AI-функцій, таких як аналітика).
 
-</div>
+## Локальний запуск
+
+**Передумови:**
+- Node.js
+- [Netlify CLI](https://docs.netlify.com/cli/get-started/)
+
+1.  **Встановіть залежності:**
+    ```bash
+    npm install
+    ```
+2.  **Створіть файл `.env`** в корені проекту та додайте в нього всі змінні середовища, як зазначено вище.
+3.  **Запустіть додаток** в режимі розробки за допомогою Netlify CLI:
+    ```bash
+    netlify dev
+    ```
