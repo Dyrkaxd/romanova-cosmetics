@@ -21,5 +21,16 @@ export default defineConfig(({ mode }) => {
           '@': path.resolve(__dirname, '.'),
         }
       },
+      build: {
+        rollupOptions: {
+          onwarn(warning, warn) {
+            // Suppress "use client" warnings from dependencies
+            if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+              return;
+            }
+            warn(warning);
+          },
+        },
+      },
     };
 });
