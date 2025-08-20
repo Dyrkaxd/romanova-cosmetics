@@ -344,9 +344,9 @@ const ProductsPage: React.FC = () => {
               ) : products.length > 0 ? products.map((product) => (
                 <tr key={product.id} className="hover:bg-rose-50/50 dark:hover:bg-slate-700/50 transition-colors">
                   <td className="px-6 py-4 text-sm font-medium text-slate-800 dark:text-slate-100 break-words">{product.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{product.group}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700 dark:text-slate-200">{product.quantity}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">${product.retailPrice.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">{product.group}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-200">{product.quantity}</td>
+                  <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">${product.retailPrice.toFixed(2)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-1">
                     <button onClick={() => navigate(`/products/${product.id}`)} className="text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors p-2 rounded-md hover:bg-sky-50 dark:hover:bg-sky-500/10" aria-label={`Переглянути деталі для ${product.name}`} title="Переглянути"><EyeIcon className="w-5 h-5"/></button>
                     <button onClick={() => openEditModal(product)} className="text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors p-2 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10" aria-label={`Редагувати ${product.name}`} title="Редагувати">

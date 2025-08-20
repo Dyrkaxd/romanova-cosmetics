@@ -159,11 +159,11 @@ const WarehousePage: React.FC = () => {
                                     
                                     return (
                                         <tr key={product.id} className={`hover:bg-rose-50/50 dark:hover:bg-slate-700/50 transition-colors ${isEditing ? 'bg-amber-50 dark:bg-amber-500/10' : ''}`}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 dark:text-slate-100">{product.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">
+                                            <td className="px-6 py-4 text-sm font-medium text-slate-800 dark:text-slate-100 break-words">{product.name}</td>
+                                            <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
                                                 <span className="font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-full text-xs">{product.group}</span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                            <td className="px-6 py-4 text-sm">
                                                 <div className="flex items-center gap-2">
                                                     <input
                                                         type="number"
