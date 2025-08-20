@@ -210,7 +210,7 @@ const TopList: React.FC<{ items: (TopProduct | TopCustomer)[], type: 'product' |
     }
     
     if (items.length === 0) {
-        return <div className="h-full flex items-center justify-center text-center py-10 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 rounded-lg">Дані відсутні.</div>;
+        return <div className="flex items-center justify-center text-center py-10 text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 rounded-lg">Дані відсутні.</div>;
     }
 
     return (
