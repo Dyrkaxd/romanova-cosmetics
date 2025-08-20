@@ -343,7 +343,7 @@ const ProductsPage: React.FC = () => {
                 <tr><td colSpan={5} className="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">Завантаження...</td></tr>
               ) : products.length > 0 ? products.map((product) => (
                 <tr key={product.id} className="hover:bg-rose-50/50 dark:hover:bg-slate-700/50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 dark:text-slate-100">{product.name}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-slate-800 dark:text-slate-100 break-words">{product.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{product.group}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700 dark:text-slate-200">{product.quantity}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">${product.retailPrice.toFixed(2)}</td>
